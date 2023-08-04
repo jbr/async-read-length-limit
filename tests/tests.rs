@@ -1,4 +1,4 @@
-use async_read_length_limit::LengthLimitExt;
+use async_read_length_limit::{LengthLimit, LengthLimitExt};
 use futures_lite::{future::block_on, io::Cursor, AsyncReadExt};
 
 const MAX_MEMORY_TO_ALLOCATE: usize = 1024 * 1024;
@@ -98,6 +98,34 @@ pub fn unit_conversions() {
             Cursor::new(b"").limit_gb(1).bytes_remaining(),
             1024 * 1024 * 1024
         );
+    });
+}
+
+#[test]
+pub fn other_interfaces() {
+    block_on(async {
+        let cursor = Cursor::new(b"b");
+        let length_limit = LengthLimit::new(cursor, 100);
+        assert_eq!(
+            length_limit.bytes_remaining(),
+            length_limit.clone().bytes_remaining()
+        );
+        assert_eq!(
+            r#"LengthLimit {
+    reader: Cursor {
+        inner: Cursor {
+            inner: [
+                98,
+            ],
+            pos: 0,
+        },
+    },
+    bytes_remaining: 100,
+}"#,
+            &format!("{length_limit:#?}")
+        );
+        assert_eq!(length_limit.as_ref().get_ref(), &b"b");
+        assert_eq!(length_limit.into_inner().into_inner(), b"b");
     });
 }
 

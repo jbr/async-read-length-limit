@@ -64,7 +64,6 @@ impl<T: AsyncRead> AsyncRead for LengthLimit<T> {
         let reader = projection.reader;
         let bytes_remaining = *projection.bytes_remaining;
 
-        dbg!(bytes_remaining);
         if bytes_remaining == 0 {
             return Poll::Ready(Err(LengthLimitExceeded.into()));
         }

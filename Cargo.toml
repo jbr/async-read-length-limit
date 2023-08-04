@@ -7,7 +7,7 @@ description = "limit the size of an async read"
 documentation = "https://docs.rs/async-read-length-limit"
 repository = "https://github.com/jbr/async-read-length-limit"
 license = "MIT OR Apache-2.0"
-keyword = ["async", "async-read", "futures"]
+keywords = ["async", "async-read", "futures"]
 categories = ["asynchronous"]
 
 

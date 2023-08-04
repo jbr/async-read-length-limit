@@ -15,7 +15,7 @@
 [crate]: https://crates.io/crates/async-read-length-limit
 [docs-badge]: https://img.shields.io/badge/docs-latest-blue.svg?style=flat-square
 [version-badge]: https://img.shields.io/crates/v/async-read-length-limit.svg?style=flat-square
-[main-docs]: https://jbr.github.io/async-read-length-limit/async-read-length-limit/
+[main-docs]: https://jbr.github.io/async-read-length-limit/async_read_length_limit
 
 ## Safety
 This crate uses `#![deny(unsafe_code)]`.

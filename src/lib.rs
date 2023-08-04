@@ -19,20 +19,24 @@
 //! ```rust
 //! use futures_lite::{io::Cursor, AsyncReadExt};
 //! use async_read_length_limit::LengthLimitExt;
+//!
 //! # futures_lite::future::block_on(async move {
+//! // input longer than limit returns an error and only reads bytes up to the limit
+//!
 //! let input_data = Cursor::new(b"these are the input data");
 //! let mut output_buf = Vec::new();
 //! let result = input_data.limit_bytes(5).read_to_end(&mut output_buf).await;
 //! assert!(result.is_err());
 //! assert_eq!(output_buf, b"these");
 //!
+//! // input shorter than limit reads transparently
 //!
 //! let input_data = Cursor::new(b"these are the input data");
 //! let mut output_buf = Vec::new();
 //! let result = input_data.limit_kb(1).read_to_end(&mut output_buf).await;
 //! assert!(result.is_ok());
 //! assert_eq!(output_buf, b"these are the input data");
-//! });
+//! # });
 //! ```
 
 use futures_lite::AsyncRead;

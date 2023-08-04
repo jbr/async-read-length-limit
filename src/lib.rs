@@ -1,3 +1,40 @@
+#![forbid(unsafe_code)]
+#![deny(
+    clippy::dbg_macro,
+    missing_copy_implementations,
+    rustdoc::missing_crate_level_docs,
+    missing_debug_implementations,
+    nonstandard_style,
+    unused_qualifications
+)]
+#![warn(missing_docs)]
+
+//! # async-read-length-limit
+//!
+//! Protects against a certain class of denial-of-service attacks wherein long chunked bodies are
+//! uploaded to web services. Can be applied to any [`AsyncRead`] type.
+//!
+//! # Examples
+//!
+//! ```rust
+//! use futures_lite::{io::Cursor, AsyncReadExt};
+//! use async_read_length_limit::LengthLimitExt;
+//! # futures_lite::future::block_on(async move {
+//! let input_data = Cursor::new(b"these are the input data");
+//! let mut output_buf = Vec::new();
+//! let result = input_data.limit_bytes(5).read_to_end(&mut output_buf).await;
+//! assert!(result.is_err());
+//! assert_eq!(output_buf, b"these");
+//!
+//!
+//! let input_data = Cursor::new(b"these are the input data");
+//! let mut output_buf = Vec::new();
+//! let result = input_data.limit_kb(1).read_to_end(&mut output_buf).await;
+//! assert!(result.is_ok());
+//! assert_eq!(output_buf, b"these are the input data");
+//! });
+//! ```
+
 use futures_lite::AsyncRead;
 use std::{
     error::Error,
@@ -8,19 +45,19 @@ use std::{
 };
 
 pin_project_lite::pin_project! {
-    /// [`AsyncRead`] length limiter
+    /// # [`AsyncRead`] length limiter
     ///
-    /// Protects against a certain class of denial-of-service attacks wherein long chunked bodies are
-    /// uploaded to web services.
-    ///
-    /// The number of bytes will never be more than the provided byte limit. If the byte limit is
-    /// exactly the length of the contained AsyncRead, it is considered an error.
-    ///
-    /// # Errors
-    ///
-    /// This will return an error if the underlying AsyncRead does so or if the read length meets (or
-    /// would exceed) the provided length limit. The returned [`std::io::Error`] will have an error kind
-    /// of [`ErrorKind::InvalidData`] and a contained error of [`LengthLimitExceeded`].
+
+/// The number of bytes will never be more than the provided byte limit. If the byte limit is
+/// exactly the length of the contained AsyncRead, it is considered an error.
+///
+/// # Errors
+///
+/// This will return an error if the underlying AsyncRead does so or if the read length meets (or
+/// would exceed) the provided length limit. The returned [`std::io::Error`] will have an error kind
+/// of [`ErrorKind::InvalidData`] and a contained error of [`LengthLimitExceeded`].
+
+    #[derive(Debug, Clone, Copy)]
     pub struct LengthLimit<T> {
         #[pin]
         reader:  T,
@@ -28,12 +65,33 @@ pin_project_lite::pin_project! {
     }
 }
 
-impl<T> LengthLimit<T> {
+impl<T> LengthLimit<T>
+where
+    T: AsyncRead,
+{
+    /// constructs a new [`LengthLimit`] with provided [`AsyncRead`] reader and `max_bytes` byte
+    /// length
     pub fn new(reader: T, max_bytes: usize) -> Self {
         Self {
             reader,
             bytes_remaining: max_bytes,
         }
+    }
+
+    /// returns the number of additional bytes before the limit is reached
+    pub fn bytes_remaining(&self) -> usize {
+        self.bytes_remaining
+    }
+
+    /// unwraps the contained AsyncRead, allowing it to be read to completion
+    pub fn into_inner(self) -> T {
+        self.reader
+    }
+}
+
+impl<T> AsRef<T> for LengthLimit<T> {
+    fn as_ref(&self) -> &T {
+        &self.reader
     }
 }
 
@@ -50,7 +108,7 @@ impl Display for LengthLimitExceeded {
 impl Error for LengthLimitExceeded {}
 impl From<LengthLimitExceeded> for std::io::Error {
     fn from(value: LengthLimitExceeded) -> Self {
-        Self::new(ErrorKind::InvalidInput, value)
+        Self::new(ErrorKind::InvalidData, value)
     }
 }
 

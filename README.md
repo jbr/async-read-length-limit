@@ -5,6 +5,7 @@
 * [Contributing][contributing]
 * [CI ![CI][ci-badge]][ci]
 * [API docs for main][main-docs]
+* [![codecov](https://codecov.io/gh/jbr/async-read-length-limit/branch/main/graph/badge.svg?token=OH9VNPYC0C)](https://codecov.io/gh/jbr/async-read-length-limit)
 
 [ci]: https://github.com/jbr/async-read-length-limit/actions?query=workflow%3ACI
 [ci-badge]: https://github.com/jbr/async-read-length-limit/workflows/CI/badge.svg

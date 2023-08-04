@@ -51,16 +51,14 @@ use std::{
 pin_project_lite::pin_project! {
     /// # [`AsyncRead`] length limiter
     ///
-
-/// The number of bytes will never be more than the provided byte limit. If the byte limit is
-/// exactly the length of the contained AsyncRead, it is considered an error.
-///
-/// # Errors
-///
-/// This will return an error if the underlying AsyncRead does so or if the read length meets (or
-/// would exceed) the provided length limit. The returned [`std::io::Error`] will have an error kind
-/// of [`ErrorKind::InvalidData`] and a contained error of [`LengthLimitExceeded`].
-
+    /// The number of bytes will never be more than the provided byte limit. If the byte limit is
+    /// exactly the length of the contained AsyncRead, it is considered an error.
+    ///
+    /// # Errors
+    ///
+    /// This will return an error if the underlying AsyncRead does so or if the read length meets (or
+    /// would exceed) the provided length limit. The returned [`std::io::Error`] will have an error kind
+    /// of [`ErrorKind::InvalidData`] and a contained error of [`LengthLimitExceeded`].
     #[derive(Debug, Clone, Copy)]
     pub struct LengthLimit<T> {
         #[pin]
@@ -73,7 +71,7 @@ impl<T> LengthLimit<T>
 where
     T: AsyncRead,
 {
-    /// constructs a new [`LengthLimit`] with provided [`AsyncRead`] reader and `max_bytes` byte
+    /// Constructs a new [`LengthLimit`] with provided [`AsyncRead`] reader and `max_bytes` byte
     /// length
     pub fn new(reader: T, max_bytes: usize) -> Self {
         Self {
@@ -82,12 +80,13 @@ where
         }
     }
 
-    /// returns the number of additional bytes before the limit is reached
+    /// Returns the number of additional bytes before the limit is reached
     pub fn bytes_remaining(&self) -> usize {
         self.bytes_remaining
     }
 
-    /// unwraps the contained AsyncRead, allowing it to be read to completion
+    /// Unwraps the contained AsyncRead, allowing it to be read to completion. bytes remaining data
+    /// are discarded
     pub fn into_inner(self) -> T {
         self.reader
     }

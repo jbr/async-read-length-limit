@@ -26,7 +26,6 @@ jobs:
         run: >-
           RUSTDOCFLAGS="-Z unstable-options --enable-index-page"
           cargo +nightly doc
-          --no-deps
           --all
       - name: Setup Pages
         uses: actions/configure-pages@v3

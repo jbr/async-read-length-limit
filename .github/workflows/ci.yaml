@@ -31,7 +31,7 @@ jobs:
     - name: Collect coverage data
       run: cargo llvm-cov nextest --workspace  --codecov --output-path codecov.json
     - name: Upload to codecov.io
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
       with:
         token: ${{secrets.CODECOV_TOKEN}}
         files: codecov.json
